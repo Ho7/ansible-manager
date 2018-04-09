@@ -1,6 +1,7 @@
 import os
 import signal
 import traceback
+import logging
 from time import sleep
 from multiprocessing import Process
 import asyncio
@@ -11,6 +12,8 @@ from django.conf import settings
 from core import consts
 from core import models
 import core.datatools.ansible
+
+logger = logging.getLogger('tasks_manager')
 
 
 class TaskManager:
@@ -30,6 +33,7 @@ class TaskManager:
                     status=consts.FAIL,
                     message='Error "pid is None"',
                 )
+                logger.warning('Task template "%s" have status FAIL' % task.template)
                 continue
 
             if not self._is_process_run(task.pid):
@@ -43,6 +47,7 @@ class TaskManager:
                 status=consts.FAIL,
                 message='Task with pid %s is not running' % task.pid
             )
+            logger.warning('Task template "%s" have status FAIL' % task.template)
 
     def start_waiting_tasks(self):
         tasks = models.Task.objects.filter(status=consts.WAIT)
@@ -98,6 +103,7 @@ class TaskManager:
                 )
                 task.status = consts.FAIL
                 task.save()
+                logger.warning('Task template "%s" have status FAIL' % task.template)
 
         except Exception as e:
             task.status = consts.FAIL
@@ -108,6 +114,8 @@ class TaskManager:
                 message='Progress error "%s"' % e,
                 status=consts.FAIL
             )
+            logger.warning('Task template "%s" have status FAIL' % task.template)
+
         finally:
             os.remove(inventory_file_path)
             if os.path.exists("/proc/%s" % task.pid):
@@ -127,6 +135,7 @@ class TaskManager:
                     messgae='Stop error "%s"' % e,
                     status=consts.FAIL
                 )
+                logger.warning('Task template "%s" have status FAIL' % task.template)
 
         task.status = consts.STOPPED
         task.save()

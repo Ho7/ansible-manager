@@ -15,7 +15,6 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
@@ -26,7 +25,6 @@ SECRET_KEY = '123'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -84,7 +82,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'project.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
@@ -94,7 +91,6 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
@@ -114,7 +110,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 
@@ -127,7 +122,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
@@ -157,11 +151,61 @@ REST_FRAMEWORK = {
     ),
 }
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'telegram': {
+            'class': 'telegram_handler.TelegramHandler',
+            'level': 'WARNING',
+            'token': 'your token',
+            'chat_id': 'chat id',
+        },
+    },
+    'loggers': {
+        'tasks_manager': {
+            'handlers': ['telegram'],
+            'level': 'WARNING',
+            'propagate': True,
+            },
+        }
+    }
+
 ANSIBLE_WORK_DIR = '/home/user/ansible'
 ANSIBLE_PLAYBOOKS_PATH = ANSIBLE_WORK_DIR + '/playbooks'
 ANSIBLE_PLAYBOOK_BIN_PATH = '/usr/bin/ansible-playbook'
+
+ALERT_USERS = {
+    'name1': {
+        'phone': '',
+        'days': (),  # sunday = 1
+        'hour': 00,
+        'minute': 00,
+    },
+    'name2': {
+        'phone': '',
+        'days': (),  # sunday = 1
+        'hour': 00,
+        'minute': 00,
+    }
+}
+
+ALERT_DELAY = 0  # minute
+
+ALERT_HANDLERS = []
+
+TELEGRAM_TOKEN = ''
+TELEGRAM_CHAT_ID = ''
+
+# For the notifications module to work (https://notify.soft-way.biz)
+# NOTIFY_HANDLER_TOKEN = ''  # To access ansible-manager to notify
+NOTIFY_SERVICE_TOKEN = ''  # To access notify to ansible-manager
+NOTIFY_SERVICE_URL = ''
 
 try:
     from project.local_settings import *
 except ImportError:
     print("Warning: no local_settings.py")
+
+LOGGING['handlers']['telegram']['token'] = TELEGRAM_TOKEN
+LOGGING['handlers']['telegram']['chat_id'] = TELEGRAM_CHAT_ID

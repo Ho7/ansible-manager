@@ -10,3 +10,4 @@ mock==2.0.0
 factory-boy==2.8.1
 croniter==0.3.16
 django-tz-detect==0.2.8
+notify-client==0.0.3
